@@ -64,13 +64,18 @@ app.get('/', (req, res) => {
 
 // Faz login com o usuário requerido no DAO
 app.post('/login', (req, res) => {
-    database.users.forEach(user => {
+    /*database.users.forEach(user => {
         if (req.body.email === user.email &&
             req.body.password === user.password) {
             return res.json(user.name + ' You are Login with Sucess');
         }
-    })
-    res.status(400).json('User not found!!');
+    })*/
+    if (req.body.email === database.users[0].email &&
+        req.body.password === database.users[0].password) {
+        res.json('Success');               
+    }else{
+        res.status(400).json('Error logging in!');
+    }
 
 })
 
