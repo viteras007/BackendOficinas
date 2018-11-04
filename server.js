@@ -2,6 +2,23 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const app = express();
+const knex = require('knex');
+
+const db = knex({
+    client: 'pg',
+    connection: {
+      host : '127.0.0.1',
+      user : 'postgres',
+      password : '',
+      database : 'Oficinas'
+    }
+  });
+
+
+
+  db.select('*').from('users').then(data=>{
+      //console.log(data);
+  });
 
 app.use(bodyParser.json());
 app.use(cors())
@@ -61,70 +78,75 @@ const databaseAlimento = {
 app.get('/', (req, res) => {
     res.send(database.users);
 })
-
 // Faz login com o usuário requerido no DAO
-app.post('/login', (req, res) => {
-    /*database.users.forEach(user => {
-        if (req.body.email === user.email &&
-            req.body.password === user.password) {
-            return res.json(user.name + ' You are Login with Sucess');
+app.post('/login', (req, res) => {   
+    const { email, password} = req.body;
+    db.where({
+        email: email,
+        password: password
+    }).select()
+    .from('users')
+    .then(user => {
+        if(user.length){
+            res.json(user[0]);
         }
-    })*/
-    if (req.body.email === database.users[0].email &&
-        req.body.password === database.users[0].password) {
-        res.json('Success');               
-    }else{
-        res.status(400).json('Error logging in!');
-    }
-
+        else{
+            res.status(400).json('user not found!');
+        }
+    })
+    .catch(err => res.status(400).json('error!!'));
 })
 
 // Muda senha do usuario
 app.put('/changepasswd', (req, res) => {
     const { id } = req.body;
-    let found = false;
-    database.users.forEach(user => {
-        if (user.id === id) {
-            found = true;
-            user.password = req.body.password;
-            return res.json('Hey '+user.name+' you has a NEWPASS: '+user.password);
+    db('users')
+    .where('id', id)
+    .update({password: req.body.password})
+    .returning('*')
+    .then(user => {
+        if(user.length){
+            res.json(user)
+        }
+        else{
+            res.status(400).json('change password fail!')
         }
     })
-    if (!found) {
-        res.status(400).json('not found');
-    }
+    .catch(err => res.status(400).json('error!'));
 })
 
 // Retorna o usuario pelo ID
 app.get('/profile/:id', (req, res) => {
-    const { id } = req.params;
-    let found = false;
-    database.users.forEach(user => {
-        if (user.id === id) {
-            found = true;
-            return res.json(user);
-        }
-    })
-    if (!found) {
-        res.status(400).json('not found');
-    }
+    const { id } = req.params;    
+    db.select('*').from('users').where({ id })
+        .then(user =>{
+            if(user.length){
+                res.json(user[0])
+            }
+            else{
+                res.status(400).json('Not Found')
+            }
+        })
+        .catch(err => res.status(400).json('Error getting user'))
+    
 })
 
 // registra um novo usuario com o id 125 e dados recebidos
 app.post('/register', (req, res) => {
     const { email, name, password } = req.body;
-    database.users.push({
-        id: '125',
+    db('users')
+    .returning('*')
+    .insert({
         name: name,
         email: email,
-        password: password,
-        height: '',
-        weight: '',
-        goal: '',
-        imc: '',
+        password: password,        
         joined: new Date()
-    })
-    res.json(database.users[database.users.length - 1]);
+    })       
+        .then(user => {
+            res.json(user[0]);
+        })
+        .catch(err => res.status(400).json('unable to register'))
+
 })
 
 //    ========================================== ALIMENTO ==========================================
