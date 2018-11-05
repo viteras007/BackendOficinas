@@ -16,67 +16,12 @@ const db = knex({
 
 
 
-  db.select('*').from('users').then(data=>{
-      //console.log(data);
-  });
-
 app.use(bodyParser.json());
 app.use(cors())
 
-//    ========================================== DAO ==========================================
-const database = {
-    users: [
-        {
-            id: '123',
-            name: 'Victor',
-            email: 'victor@gmail.com',
-            password: '1234',
-            height: '',
-            weight: '',
-            goal: '',
-            imc: '',
-            joined: new Date()
-        },
-        {
-            id: '124',
-            name: 'Andre',
-            email: 'andre@gmail.com',
-            password: '1234',
-            height: '',
-            weight: '',
-            goal: '',
-            imc: '',
-            joined: new Date()
-        }
-    ],
-}
-const databaseAlimento = {
-    alimento: [
-        {
-            id: '1',
-            name: 'Banana',
-            caloria: '20g',
-            proteina: '20g',
-            carboidrato: '20g',
-            gordura: '20g',
-            dataRegistro: new Date()
-        },
-        {
-            id: '2',
-            name: 'maça',
-            caloria: '20g',
-            proteina: '20g',
-            carboidrato: '20g',
-            gordura: '20g',
-            dataRegistro: new Date()
-        }
-    ],
-}
-//    ========================================== USUARIO ==========================================
-
 // Mostrar todos no DAO (database.users)
 app.get('/', (req, res) => {
-    res.send(database.users);
+    
 })
 // Faz login com o usuário requerido no DAO
 app.post('/login', (req, res) => {   
@@ -152,60 +97,73 @@ app.post('/register', (req, res) => {
 //    ========================================== ALIMENTO ==========================================
 
 // Inserir alimento
-app.post('/insertfood', (req, res) => {
+app.post('/insertfood', (req, res) => {    
     const { caloria, name, proteina, carboidrato, gordura } = req.body;
-    databaseAlimento.alimento.push({
-        id: '3',
+    db('food')
+    .returning('*')
+    .insert({
         name: name,
         caloria: caloria,
-        proteina: proteina,
-        carboidrato: carboidrato,
-        gordura: gordura,
-        dataRegistro: new Date()
-    })
-    res.json(databaseAlimento.alimento[databaseAlimento.alimento.length - 1]);
+        proteina: proteina, 
+        carboidrato: carboidrato, 
+        gordura: gordura,     
+        dataregistro: new Date()
+    })       
+        .then(food => {
+            res.json(food[0]);
+        })
+        .catch(err => res.status(400).json('unable to register this food'))
 })
 
 // Retorna o alimento pelo ID
 app.get('/food/:id', (req, res) => {
-    const { id } = req.params;
-    let found = false;
-    databaseAlimento.alimento.forEach(food => {
-        if (food.id === id) {
-            found = true;
-            return res.json(food);
-        }
-    })
-    if (!found) {
-        res.status(400).json('Food not found');
-    }
+    const { id } = req.params;    
+    db.select('*').from('food').where({ id })
+        .then(food =>{
+            if(food.length){
+                res.json(food[0])
+            }
+            else{
+                res.status(400).json('Not Found')
+            }
+        })
+        .catch(err => res.status(400).json('Error getting Food'))
 })
 // update no alimento passando id e alterando apenas o nome
 app.put('/updatefood', (req, res) => {
-    const { id } = req.body;
-    let found = false;
-    databaseAlimento.alimento.forEach(food => {
-        if (food.id === id) {
-            found = true;
-            food.name = req.body.name;
-            return res.json('ID: '+food.id+' NAME: '+food.name);
+    const { id , name, caloria, proteina, carboidrato , gordura} = req.body;
+    db('food')
+    .where('id', id)
+    .update({
+        name: name,
+        caloria: caloria,
+        proteina: proteina, 
+        carboidrato: carboidrato, 
+        gordura: gordura,
+    })
+    .returning('*')
+    .then(food => {
+        if(food.length){
+            res.json(food)
+        }
+        else{
+            res.status(400).json('change food fail!')
         }
     })
-    if (!found) {
-        res.status(400).json('not found');
-    }
+    .catch(err => res.status(400).json('error!'));
 })
 
 // deletar alimento (dando um erro no cmd de headers)
 app.delete('/delfood', (req, res) => {
-    databaseAlimento.alimento.forEach(food => {
-        if (req.body.id === food.id){
-            databaseAlimento.alimento.slice(food);
-            return res.json(food.name + ' deleted with Sucess');
-        }
+    const { id } = req.body;    
+    db('food')
+    .where('id', id)
+    .del()
+    .then(response => {
+      res.json("REMOVIDO COM SUCESSO")
     })
-    res.status(400).json('User not found!!');
-
+    .catch(err => res.status(400).json('error!'));
+          
 })
 
 
