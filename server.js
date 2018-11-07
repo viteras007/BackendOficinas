@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const app = express();
 const knex = require('knex');
-
+/*
 const db = knex({
     client: 'pg',
     connection: {
@@ -13,7 +13,16 @@ const db = knex({
       database : 'Oficinas'
     }
   });
-
+  */
+  var db = require('knex')({
+    client: 'mysql',
+    connection: {
+      host : '127.0.0.1',
+      user : 'root',
+      password : '',
+      database : 'Oficinas'
+    }
+  });
 
 
 app.use(bodyParser.json());
