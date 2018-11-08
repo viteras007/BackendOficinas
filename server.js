@@ -68,6 +68,35 @@ app.put('/changepasswd', (req, res) => {
     })
     .catch(err => res.status(400).json('error!'));
 })
+//Altera todos dados do usuario
+app.put('/alterauser', (req, res) => {
+    const { id, height, weight} = req.body;
+    const imc = weight / (height * height); //ALTURA EM METROS , SE USAR EM CM  TEM Q MUDAR
+    db('users')
+    .where('id', id)
+    .update({        
+        height: height,
+        weight: weight,
+        imc: imc     
+    })
+    .returning('*')
+    .then(user => {
+        res.json(user);
+    })
+    .catch(err => res.status(400).json('error!'));
+})
+//Alterar meta do usuario
+app.put('/alteragoal', (req, res) => {
+    const { id,goal } = req.body;
+    db('users')
+    .where('id', id)
+    .update({goal: goal})
+    .returning('*')
+    .then(user => {
+        res.json(user);
+    })
+    .catch(err => res.status(400).json('error!'));
+})
 
 // Retorna o usuario pelo ID
 app.get('/profile/:id', (req, res) => {
@@ -172,6 +201,11 @@ app.delete('/delfood', (req, res) => {
       res.json("REMOVIDO COM SUCESSO")
     })
     .catch(err => res.status(400).json('error!'));
+          
+})
+// 
+app.get('/allfood', (req, res) => {     
+    db.select().from('food').then(response => {res.json(response)})
           
 })
 
