@@ -71,14 +71,16 @@ app.put('/changepasswd', (req, res) => {
 })
 //Altera todos dados do usuario
 app.put('/alterauser', (req, res) => {
-    const { id, height, weight} = req.body;
-    const imc = weight / (height * height); //ALTURA EM METROS , SE USAR EM CM  TEM Q MUDAR
+    const { id, height, weight, goal, idade} = req.body;
+    const imc = weight / ((height/100) * (height/100)); //ALTURA EM METROS , SE USAR EM CM  TEM Q MUDAR
     db('users')
     .where('id', id)
     .update({        
         height: height,
         weight: weight,
-        imc: imc     
+        imc: imc,
+        idade: idade,
+        goal: goal   
     })
     .returning('*')
     .then(user => {
@@ -86,7 +88,7 @@ app.put('/alterauser', (req, res) => {
     })
     .catch(err => res.status(400).json('error!'));
 })
-//Alterar meta do usuario
+/*//Alterar meta do usuario
 app.put('/alteragoal', (req, res) => {
     const { id,goal } = req.body;
     db('users')
@@ -97,7 +99,7 @@ app.put('/alteragoal', (req, res) => {
         res.json(user);
     })
     .catch(err => res.status(400).json('error!'));
-})
+})*/
 
 // Retorna o usuario pelo ID
 app.get('/profile/:id', (req, res) => {
@@ -117,13 +119,14 @@ app.get('/profile/:id', (req, res) => {
 
 // registra um novo usuario com o id 125 e dados recebidos
 app.post('/register', (req, res) => {
-    const { email, name, password } = req.body;
+    const { email, name, password, sexo } = req.body;
     db('users')
     .returning('*')
     .insert({
         name: name,
         email: email,
-        password: password,        
+        password: password, 
+        sexo: sexo,       
         joined: new Date()
     })       
         .then(user => {
