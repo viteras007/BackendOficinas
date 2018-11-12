@@ -214,7 +214,38 @@ app.get('/allfood', (req, res) => {
           
 })
 
+// ============================================== DIETA =============================
+app.post('/criardieta', (req, res) => {    
+    const { caloria, idusuario, proteina, carboidrato, gordura } = req.body;
+    db('dieta')
+    .returning('*')
+    .insert({        
+        caloria: caloria,
+        proteina: proteina, 
+        carboidrato: carboidrato, 
+        gordura: gordura,     
+        idusuario: idusuario        
+    })       
+        .then(dieta => {
+            res.json(dieta[0]);
+        })
+        .catch(err => res.status(400).json('unable to create!'))
+})
 
+app.post('/progresso', (req, res) => {    
+    const { idusuario, peso } = req.body;
+    db('progresso')
+    .returning('*')
+    .insert({        
+        peso: peso,     
+        idusuario: idusuario,
+        data: new Date()        
+    })       
+        .then(progresso => {
+            res.json(progresso[0]);
+        })
+        .catch(err => res.status(400).json('unable to create!'))
+})
 
 //    ========================================== Servidor ==========================================
 app.listen(3001, () => {
