@@ -247,6 +247,43 @@ app.post('/progresso', (req, res) => {
         .catch(err => res.status(400).json('unable to create!'))
 })
 
+app.post('/caloriatotal', (req, res) => {   
+    const { idusuario } = req.body;
+    db.where({
+        idusuario: idusuario        
+    }).select('*')
+    .from('dieta')
+    .then(dieta => {        
+        res.json(dieta[0].caloria);        
+    })
+    .catch(err => res.status(400).json('error!!'));
+})
+
+app.post('/dietamacros', (req, res) => {   
+    const { idusuario } = req.body;
+    db.where({
+        idusuario: idusuario        
+    }).select('*')
+    .from('dieta')
+    .then(dieta => {        
+        res.json(dieta[0]);        
+    })
+    .catch(err => res.status(400).json('error!!'));
+})
+
+app.post('/progressouser', (req, res) => {   
+    const { idusuario } = req.body;
+    db.where({
+        idusuario: idusuario        
+    }).select('*')
+    .from('progresso')
+    .then(progresso => {        
+        res.json(progresso);        
+    })
+    .catch(err => res.status(400).json('error!!'));
+})
+
+
 //    ========================================== Servidor ==========================================
 app.listen(3001, () => {
     console.log('app is running on port 3001');
