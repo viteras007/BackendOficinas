@@ -55,16 +55,17 @@ app.post('/login', (req, res) => {
 app.put('/changepasswd', (req, res) => {
     const { id } = req.body;
     db('users')
-    .where('id', id)
+    .where('Id', id)
     .update({password: req.body.password})
     .returning('*')
     .then(user => {
+        res.json("ALTERADO COM SUCESSO")/*
         if(user.length){
             res.json(user)
         }
         else{
             res.status(400).json('change password fail!')
-        }
+        }*/
     })
     .catch(err => res.status(400).json('error!'));
 })
@@ -136,7 +137,7 @@ app.post('/register', (req, res) => {
 
 // Inserir alimento
 app.post('/insertfood', (req, res) => {    
-    const { caloria, name, proteina, carboidrato, gordura } = req.body;
+    const { caloria, name, proteina, carboidrato, gordura, imglink } = req.body;
     db('food')
     .returning('*')
     .insert({
@@ -145,7 +146,8 @@ app.post('/insertfood', (req, res) => {
         proteina: proteina, 
         carboidrato: carboidrato, 
         gordura: gordura,     
-        dataregistro: new Date()
+        dataregistro: new Date(),
+        imglink: imglink
     })       
         .then(food => {
             res.json(food[0]);
