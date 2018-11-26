@@ -101,6 +101,8 @@ app.put('/alteragoal', (req, res) => {
     .catch(err => res.status(400).json('error!'));
 })*/
 
+
+
 // Retorna o usuario pelo ID
 app.get('/profile/:id', (req, res) => {
     const { id } = req.params;    
@@ -119,14 +121,19 @@ app.get('/profile/:id', (req, res) => {
 
 // registra um novo usuario com o id 125 e dados recebidos
 app.post('/register', (req, res) => {
-    const { email, name, password, sexo } = req.body;
+    const { email, name, password, sexo, weight, height, idade} = req.body;
+    const imc = weight / ((height/100) * (height/100));
     db('users')
     .returning('*')
     .insert({
         name: name,
         email: email,
         password: password, 
-        sexo: sexo,       
+        sexo: sexo,
+        weight: weight,
+        height: height,
+        imc: imc,
+        idade: idade,
         joined: new Date()
     })       
         .then(user => {
@@ -134,6 +141,19 @@ app.post('/register', (req, res) => {
         })
         .catch(err => res.status(400).json('unable to register'))
 
+})
+
+//busca pelo email
+app.post('/buscaemail', (req, res) => {   
+    const { email} = req.body;
+    db.where({
+        email: email
+    }).select()
+    .from('users')
+    .then(user => {        
+        res.json(user[0]);       
+    })
+    .catch(err => res.status(400).json('error!!'));
 })
 
 //    ========================================== ALIMENTO ==========================================
