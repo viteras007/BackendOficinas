@@ -157,6 +157,37 @@ app.post('/buscaemail', (req, res) => {
 })
 
 //    ========================================== ALIMENTO ==========================================
+//consumir alimento na dieta
+app.post('/refeicao', (req, res) => {
+    const { iddieta, caloria, proteina, gordura, carboidrato} = req.body;    
+    db('refeicao')
+    .returning('*')
+    .insert({
+        iddieta: iddieta,
+        caloria: caloria,
+        proteina: proteina, 
+        carboidrato: carboidrato,
+        gordura: gordura,
+        data: new Date()
+    })       
+        .then(refeicao => {
+            res.json(refeicao);
+        })
+        .catch(err => res.status(400).json('unable to register'))
+
+})
+
+app.post('/buscadieta', (req, res) => {   
+    const { idusuario } = req.body;
+    db.where({
+        idusuario: idusuario
+    }).select()
+    .from('dieta')
+    .then(dieta => {        
+        res.json(dieta);       
+    })
+    .catch(err => res.status(400).json('error!!'));
+})
 
 //busca alimento pelo id
 app.post('/buscafood', (req, res) => {   
