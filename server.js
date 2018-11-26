@@ -158,6 +158,20 @@ app.post('/buscaemail', (req, res) => {
 
 //    ========================================== ALIMENTO ==========================================
 
+//busca alimento pelo id
+app.post('/buscafood', (req, res) => {   
+    const { id } = req.body;
+    db.where({
+        id: id
+    }).select()
+    .from('food')
+    .then(food => {        
+        res.json(food[0]);       
+    })
+    .catch(err => res.status(400).json('error!!'));
+})
+
+
 // Inserir alimento
 app.post('/insertfood', (req, res) => {    
     const { caloria, name, proteina, carboidrato, gordura, imglink } = req.body;
