@@ -265,7 +265,7 @@ app.put('/updatefood', (req, res) => {
 app.delete('/delfood', (req, res) => {
     const { id } = req.body;    
     db('food')
-    .where('id', id)
+    .where('Id', id)
     .del()
     .then(response => {
       res.json("REMOVIDO COM SUCESSO")
@@ -320,6 +320,30 @@ app.post('/caloriatotal', (req, res) => {
     .from('dieta')
     .then(dieta => {        
         res.json(dieta[0].caloria);        
+    })
+    .catch(err => res.status(400).json('error!!'));
+})
+
+app.post('/dietatotal', (req, res) => {   
+    const { idusuario } = req.body;
+    db.where({
+        idusuario: idusuario        
+    }).select('*')
+    .from('dieta')
+    .then(dieta => {        
+        res.json(dieta[0]);        
+    })
+    .catch(err => res.status(400).json('error!!'));
+})
+
+app.post('/refeicaototal', (req, res) => {   
+    const { iddieta } = req.body;
+    db.where({
+        iddieta: iddieta        
+    }).select('*')
+    .from('refeicao')
+    .then(refeicao => {        
+        res.json(refeicao);        
     })
     .catch(err => res.status(400).json('error!!'));
 })
