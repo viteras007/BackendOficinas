@@ -1,4 +1,5 @@
-# BackendOficinas
+# SISTEMA YOUNGLIFE
 Site de criação de dietas e gerenciamento de peso e dieta!
 
-BACKEND DO SISTEMA NovoOficinas (OFICINAS 3)
+FRONTEND DO SISTEMA NovoOficinas (REACTJS)
+BACKEND DO SISTEMA BackendOficinas (NODEJS, EXPRESSJS)
