@@ -22,7 +22,7 @@ const db = knex({
     connection: {
       host : 'mysql995.umbler.com:41890',
       user : 'viteras007',
-      password : 'victore1r2t3',
+      password : '**********',
       database : 'trabalhooficinas'
     }
   });
